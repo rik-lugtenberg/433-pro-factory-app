@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     color: Color.white,
     marginTop: 20,
     fontSize: Metrics.screenWidth * 0.06,
-    ...Fonts.PoppinsBold,
   },
   marker: {
     width: Metrics.screenWidth * 0.6,

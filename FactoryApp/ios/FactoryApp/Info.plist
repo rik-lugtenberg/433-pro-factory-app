@@ -35,6 +35,19 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>To connect to 433 Pro sensors</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To scan sensor QR code</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UILaunchStoryboardName</key>

@@ -6,7 +6,7 @@ export const checkPermissionForCamera = async () => {
   const permissions = await Permissions.check(
     Platform.select({
       android: Permissions.PERMISSIONS.ANDROID.CAMERA,
-      // ios: Permissions.PERMISSIONS.IOS.CAMERA,
+      ios: Permissions.PERMISSIONS.IOS.CAMERA,
     }),
   );
   if (permissions === 'blocked') {
@@ -15,7 +15,7 @@ export const checkPermissionForCamera = async () => {
     request(
       Platform.select({
         android: PERMISSIONS.ANDROID.CAMERA,
-        // ios: PERMISSIONS.IOS.CAMERA,
+        ios: PERMISSIONS.IOS.CAMERA,
       }).catch(error => console.log('error', error)),
     );
   }
