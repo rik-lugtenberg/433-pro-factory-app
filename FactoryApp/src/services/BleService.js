@@ -3,41 +3,41 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform,
-} from "react-native";
-import BleManager from "react-native-ble-manager";
-import Permissions, { PERMISSIONS, RESULTS } from "react-native-permissions";
+} from 'react-native';
+import BleManager from 'react-native-ble-manager';
+import Permissions, {PERMISSIONS, RESULTS} from 'react-native-permissions';
 
-import BleConstants from "../constants/BleConstants";
+import BleConstants from '../constants/BleConstants';
 
 const BLE_PERMISSIONS = Platform.select({
   android: [
     PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
     PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-    "android.permission.BLUETOOTH_ADMIN",
-    "android.permission.BLUETOOTH",
-    "android.permission.FOREGROUND_SERVICE",
+    'android.permission.BLUETOOTH_ADMIN',
+    'android.permission.BLUETOOTH',
+    'android.permission.FOREGROUND_SERVICE',
   ],
   ios: [PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL],
 });
 
-const BLE_DISCOVER_PERIPHERAL_EVENT = "BleManagerDiscoverPeripheral";
-const BLE_NOTIFY_EVENT = "BleManagerDidUpdateValueForCharacteristic";
-const BLE_CONNECT_EVENT = "BleManagerConnectPeripheral";
-const BLE_DISCONNECT_EVENT = "BleManagerDisconnectPeripheral";
+const BLE_DISCOVER_PERIPHERAL_EVENT = 'BleManagerDiscoverPeripheral';
+const BLE_NOTIFY_EVENT = 'BleManagerDidUpdateValueForCharacteristic';
+const BLE_CONNECT_EVENT = 'BleManagerConnectPeripheral';
+const BLE_DISCONNECT_EVENT = 'BleManagerDisconnectPeripheral';
 
 // Little-endian
-const bytesToNumber = (bytes) => {
+const bytesToNumber = bytes => {
   const dataHex = bytes
-    .map((b) => b.toString(16).padStart(2, "0"))
+    .map(b => b.toString(16).padStart(2, '0'))
     .reverse()
-    .join("");
+    .join('');
 
   return parseInt(dataHex, 16);
 };
 
-const stringToCharCode = (string) => {
-  const array = Array.from(string).map((char) => {
+const stringToCharCode = string => {
+  const array = Array.from(string).map(char => {
     return char.charCodeAt(0);
   });
   return array;
@@ -51,6 +51,7 @@ class BleService {
   }
 
   async initialize() {
+    console.log('init!');
     let checkPermissions = await Permissions.checkMultiple(BLE_PERMISSIONS);
 
     for (const permission in checkPermissions) {
@@ -67,18 +68,18 @@ class BleService {
     checkPermissions = await Permissions.checkMultiple(BLE_PERMISSIONS);
     if (
       Object.values(checkPermissions).some(
-        (p) => p !== RESULTS.GRANTED && p !== RESULTS.UNAVAILABLE
+        p => p !== RESULTS.GRANTED && p !== RESULTS.UNAVAILABLE,
       )
     ) {
       return false;
     }
-    await BleManager.start({ showAlert: true });
+    await BleManager.start({showAlert: true});
     return true;
   }
 
   async connect(id, timeout) {
     if (
-      Platform.OS === "ios" &&
+      Platform.OS === 'ios' &&
       (await BleManager.isPeripheralConnected(id, []))
     ) {
       return;
@@ -93,14 +94,14 @@ class BleService {
               clearTimeout(timer);
               resolve();
             })
-            .catch((e) => {
-              console.log("In the catch of BleManager retrieveServices", e);
+            .catch(e => {
+              console.log('In the catch of BleManager retrieveServices', e);
               clearTimeout(timer);
               reject(e);
             });
         })
-        .catch((a) => {
-          console.log("In the catch of the blemanager connect", a);
+        .catch(a => {
+          console.log('In the catch of the blemanager connect', a);
           reject(a);
         });
     });
@@ -116,6 +117,10 @@ class BleService {
     });
   }
 
+  async sleep(m) {
+    return new Promise(r => setTimeout(r, m));
+  }
+
   async disconnect(id) {
     this.eventHandlers.forEach((value, key) => {
       if (!key.includes(id)) {
@@ -123,13 +128,13 @@ class BleService {
       }
     });
     await BleManager.disconnect(id);
-    if (Platform.OS !== "ios") {
+    if (Platform.OS !== 'ios') {
       const peripheralConnected = await BleManager.isPeripheralConnected(
         id,
-        []
+        [],
       );
       if (peripheralConnected) {
-        console.log("in remove peripheral");
+        console.log('in remove peripheral');
 
         await BleManager.removePeripheral(id);
       }
@@ -139,7 +144,7 @@ class BleService {
   async write(id, serviceUUID, characteristicUUID, data) {
     await this.connect(id);
     try {
-      if (typeof data === "string" || data instanceof String) {
+      if (typeof data === 'string' || data instanceof String) {
         data = stringToCharCode(data);
       } else if (!Array.isArray(data)) {
         data = [data];
@@ -150,7 +155,7 @@ class BleService {
         serviceUUID,
         characteristicUUID,
         data,
-        data.length
+        data.length,
       );
     } catch (e) {
       throw new Error(e);
@@ -180,7 +185,7 @@ class BleService {
     remove();
     this.eventHandlers.set(
       key,
-      this.eventEmitter.addListener(BLE_NOTIFY_EVENT, (e) => {
+      this.eventEmitter.addListener(BLE_NOTIFY_EVENT, e => {
         if (
           e.peripheral.toLowerCase() === id.toLowerCase() &&
           e.characteristic.toLowerCase() === characteristicUUID.toLowerCase() &&
@@ -188,7 +193,7 @@ class BleService {
         ) {
           callback(e.value, remove);
         }
-      })
+      }),
     );
 
     await this.connect(id);
@@ -208,11 +213,11 @@ class BleService {
         }
       };
 
-      const timer = setTimeout(() => finished(false, ""), 30000);
+      const timer = setTimeout(() => finished(false, ''), 32000);
 
       this.eventEmitter.addListener(
         BLE_DISCOVER_PERIPHERAL_EVENT,
-        ({ id, name }) => {
+        ({id, name}) => {
           if (name !== `${sensorName}`) {
             return;
           }
@@ -223,37 +228,80 @@ class BleService {
                 .then(() => {
                   finished(true, id);
                 })
-                .catch((e) => {
+                .catch(e => {
                   finished(false, id);
                 });
             })
-            .catch((e) => {
+            .catch(e => {
               finished(false, id);
             });
-        }
+        },
       );
       BleManager.scan([BleConstants.modelData.serviceUUID], 30, false);
     });
   }
 
   onDisconnect(callback) {
-    const listener = this.eventEmitter.addListener(
-      BLE_DISCONNECT_EVENT,
-      (e) => {
-        (async () => {
-          await callback(e.peripheral);
-        })();
-      }
-    );
+    const listener = this.eventEmitter.addListener(BLE_DISCONNECT_EVENT, e => {
+      (async () => {
+        await callback(e.peripheral);
+      })();
+    });
     return listener.remove;
   }
 
   async getFirmwareRevision(id) {
-    const { serviceUUID, characteristicUUID } =
-      BleConstants.firmwareVersionData;
+    const {serviceUUID, characteristicUUID} = BleConstants.firmwareVersionData;
 
     const bytes = await this.read(id, serviceUUID, characteristicUUID);
     return String.fromCharCode(...bytes);
+  }
+
+  async getBatteryLevel(id) {
+    const {serviceUUID, characteristicUUID} = BleConstants.batteryLevel;
+    const level = await this.read(id, serviceUUID, characteristicUUID);
+
+    return level[0];
+  }
+  async getDebugValue(id) {
+    const {serviceUUID, characteristicUUID} = BleConstants.debug;
+    const debugValue = await this.read(id, serviceUUID, characteristicUUID);
+
+    return String.fromCharCode(...debugValue);
+  }
+
+  async getModelName(id) {
+    const {serviceUUID, characteristicUUID} = BleConstants.modelData;
+
+    const bytes = await this.read(id, serviceUUID, characteristicUUID);
+    return String.fromCharCode(...bytes);
+  }
+
+  async onDebugValueChange(id, callbackId, callback) {
+    const {serviceUUID, characteristicUUID} = BleConstants.debug;
+
+    return this.notify(
+      id,
+      serviceUUID,
+      characteristicUUID,
+      callbackId,
+      value => {
+        callback(String.fromCharCode(...value));
+      },
+    );
+  }
+
+  async onBatteryLevelChange(id, callbackId, callback) {
+    const {serviceUUID, characteristicUUID} = BleConstants.batteryLevel;
+    return this.notify(
+      id,
+      serviceUUID,
+      characteristicUUID,
+      callbackId,
+      value => {
+        callback(value[0]);
+      },
+    );
   }
 }
 const bleService = new BleService();

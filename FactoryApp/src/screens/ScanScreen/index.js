@@ -1,53 +1,77 @@
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import React, {useEffect, useState} from 'react';
-import {Text, View, RippleEffect} from 'react-native';
+import {Text, View} from 'react-native';
 import styles from './styles';
-import {test} from '../../helpers/permissionHelper';
+import {checkPermissionForCamera} from '../../helpers/permissionHelper';
+import bleService from '../../services/BleService';
+import {LoadingState} from '../../components/LoadingState';
 
-function ScanScreen() {
+function ScanScreen(props) {
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     (async () => {
-      test();
-      // await checkPermissionForCamera();
+      await checkPermissionForCamera();
     })();
   }, []);
 
-  const [loading, setLoading] = useState(false);
+  const getSensorName = data => {
+    return `JS_${data.slice(data.indexOf('_') + 1, data.lastIndexOf('_'))}`;
+  };
+
+  const getSensorKey = data => {
+    const splitArray = data.split('_');
+    return splitArray[splitArray.length - 1];
+  };
 
   const onQrCodeScanned = async event => {
     const {data} = event;
 
-    if (
-      !data ||
-      typeof data !== 'string' ||
-      data.indexOf('_') === data.lastIndexOf('_')
-    ) {
-      showToast('Invalid QR data format!', 1000);
-      return;
-    }
-
-    const newSensorName = getSensorName(data);
-    const newSensorKey = getSensorKey(data);
-
-    if (connectedSensors.some(e => e.name === newSensorName)) {
-      showToast('This sensor is already scanned', 1000);
-      return;
-    }
     setLoading(true);
+    console.log('a');
+    try {
+      if (
+        !data ||
+        typeof data !== 'string' ||
+        data.indexOf('_') === data.lastIndexOf('_')
+      ) {
+        return;
+      }
+      const newSensorName = getSensorName(data);
 
-    setSensorName(newSensorName);
-    setSensorKey(newSensorKey);
-    connectToSensor(newSensorName, newSensorKey);
+      const id = await bleService.pair(newSensorName);
+
+      console.log('SCANNED!');
+
+      if (props.onScan) {
+        console.log('herrooooo');
+        props.onScan(id, newSensorName);
+      }
+    } catch (e) {
+      console.log('IS NOT CONNECTED');
+    }
+    setLoading(false);
   };
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.headerWrapper}>
-        <View style={styles.header}>
-          {/* <RippleEffect style={styles.headerButtons}></RippleEffect> */}
-        </View>
-      </View>
-      {!loading && <QRCodeScanner onRead={onQrCodeScanned} />}
+      {!loading && (
+        <>
+          <View style={styles.headerWrapper}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Scan The sensor QR Code</Text>
+            </View>
+          </View>
+          <QRCodeScanner
+            onRead={onQrCodeScanned}
+            showMarker
+            reactivate
+            reactivateTimeout={400}
+            customMarker={<View style={styles.marker} />}
+          />
+        </>
+      )}
+      {loading && <LoadingState showConnectingText />}
     </View>
   );
 }
