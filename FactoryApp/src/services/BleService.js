@@ -6,8 +6,10 @@ import {
 } from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import Permissions, {PERMISSIONS, RESULTS} from 'react-native-permissions';
+import BluetoothStateManager from 'react-native-bluetooth-state-manager';
 
 import BleConstants from '../constants/BleConstants';
+import logService from './LogService';
 
 const BLE_PERMISSIONS = Platform.select({
   android: [
@@ -45,13 +47,33 @@ const stringToCharCode = string => {
 
 class BleService {
   constructor() {
+    let bleArray = [];
+    for (const [key, value] of Object.entries(BleConstants)) {
+      bleArray.push({
+        name: key,
+        serviceUUID: value?.serviceUUID,
+        characteristicUUID: value?.characteristicUUID,
+      });
+    }
+    this.bleConstants = bleArray;
+
     this.eventEmitter = new NativeEventEmitter(NativeModules.BleManager);
     this.eventHandlers = new Map();
     this.disconnectSensors = false;
   }
 
+  log(id, message, serviceUUID, characteristicUUID) {
+    const bleKeyName = this.bleConstants.find(
+      e =>
+        e.serviceUUID === serviceUUID &&
+        e.characteristicUUID === characteristicUUID,
+    )?.name;
+    // const sensor = this.logSensors.find((e) => e.id === id);
+
+    logService.log(`${bleKeyName ? `${bleKeyName}` : ''} | ${message} `);
+  }
+
   async initialize() {
-    console.log('init!');
     let checkPermissions = await Permissions.checkMultiple(BLE_PERMISSIONS);
 
     for (const permission in checkPermissions) {
@@ -134,8 +156,6 @@ class BleService {
         [],
       );
       if (peripheralConnected) {
-        console.log('in remove peripheral');
-
         await BleManager.removePeripheral(id);
       }
     }
@@ -143,12 +163,21 @@ class BleService {
 
   async write(id, serviceUUID, characteristicUUID, data) {
     await this.connect(id);
+    let parsedData = data;
     try {
       if (typeof data === 'string' || data instanceof String) {
-        data = stringToCharCode(data);
+        parsedData = stringToCharCode(data);
       } else if (!Array.isArray(data)) {
-        data = [data];
+        parsedData = [data];
       }
+      this.log(
+        id,
+        `Writing data: Parsed : ${parsedData} | Unparsed: ${data}`,
+        serviceUUID,
+        characteristicUUID,
+      );
+
+      console.log('komt hij hier nog?', parsedData);
 
       await BleManager.write(
         id,
@@ -158,6 +187,7 @@ class BleService {
         data.length,
       );
     } catch (e) {
+      logService.log(`Writing: ${e}`, 'Error');
       throw new Error(e);
     }
   }
@@ -166,8 +196,17 @@ class BleService {
     await this.connect(id);
     try {
       const value = await BleManager.read(id, serviceUUID, characteristicUUID);
+      this.log(
+        id,
+        `Reading data: Parsed : ${
+          Array.isArray(value) ? String.fromCharCode(...value) : ''
+        } | Unparsed: ${value}  `,
+        serviceUUID,
+        characteristicUUID,
+      );
       return value;
     } catch (e) {
+      logService.log(`Reading: ${e}`, 'Error');
       throw new Error(e);
     }
   }
@@ -202,9 +241,16 @@ class BleService {
     return remove;
   }
 
-  pair(sensorName) {
+  async pair(sensorName) {
     return new Promise((resolve, reject) => {
-      const finished = (success, id) => {
+      const finished = async (success, id) => {
+        if (!success) {
+          let status = await BluetoothStateManager.getState();
+          logService.log(
+            `${id} | Did not connect to sensor | Bluetooth status: ${status} `,
+          );
+        }
+
         this.eventEmitter.removeAllListeners(BLE_DISCOVER_PERIPHERAL_EVENT);
         if (success) {
           resolve(id);
@@ -248,6 +294,26 @@ class BleService {
       })();
     });
     return listener.remove;
+  }
+
+  async setToTransportMode(id) {
+    const {serviceUUID, characteristicUUID} = BleConstants.sensorControlCmd;
+
+    // const byteArray = [0xad, 0xde];
+    const byteArray = [0xde, 0xad];
+
+    try {
+      console.log('before writing', id);
+      await this.write(id, serviceUUID, characteristicUUID, byteArray);
+      console.log('after writing');
+    } catch (e) {
+      console.log('the exception : ', e);
+    }
+  }
+
+  async getRSSI(id) {
+    const rssi = await BleManager.readRSSI(id);
+    return rssi;
   }
 
   async getFirmwareRevision(id) {

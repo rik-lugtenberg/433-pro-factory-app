@@ -4,6 +4,7 @@ import styles from './styles';
 import {checkPermissionForCamera} from '../../helpers/permissionHelper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import RNFetchBlob from 'rn-fetch-blob';
+import bleService from '../../services/BleService';
 
 function DetailsScreen(props) {
   const circlePassIcon = <Icon name="check-circle" size={30} color="white" />;
@@ -15,8 +16,6 @@ function DetailsScreen(props) {
   const passedCheck = sensor?.dbmValue > -60 && sensor.battery > 50;
 
   const onPressNextQRCode = async () => {
-    console.log('THE SENSOR IN QR CODE', sensor);
-
     const secretKey = 'MLMRUkY4ptwJhf2sY44BymlRaUiLrSjY';
     const label = 'Post Assembly Test';
     const test_id = sensor.dbmValue;
@@ -27,12 +26,14 @@ function DetailsScreen(props) {
     const result = passedCheck ? 'PASS' : 'FAIL';
     const app_firmware = sensor.firmware;
 
-    const response = await RNFetchBlob.fetch(
-      'POST',
-      'http://puppygifs.tumblr.com/api/read/json',
-    );
+    if (passedCheck) {
+      await bleService.setToTransportMode(sensor.id);
+    }
 
-    console.log(response);
+    // const response = await RNFetchBlob.fetch(
+    //   'POST',
+    //   'http://puppygifs.tumblr.com/api/read/json',
+    // );
 
     // const response = await RNFetchBlob.fetch(
     //   'POST',
@@ -44,9 +45,7 @@ function DetailsScreen(props) {
     //   // payload
     // );
 
-    resetSensor();
-
-    console.log('done sending');
+    await resetSensor();
   };
 
   return (

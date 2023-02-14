@@ -9,12 +9,6 @@ import {LoadingState} from '../../components/LoadingState';
 function ScanScreen(props) {
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      await checkPermissionForCamera();
-    })();
-  }, []);
-
   const getSensorName = data => {
     return `JS_${data.slice(data.indexOf('_') + 1, data.lastIndexOf('_'))}`;
   };
@@ -28,7 +22,6 @@ function ScanScreen(props) {
     const {data} = event;
 
     setLoading(true);
-    console.log('a');
     try {
       if (
         !data ||
@@ -38,18 +31,12 @@ function ScanScreen(props) {
         return;
       }
       const newSensorName = getSensorName(data);
-
       const id = await bleService.pair(newSensorName);
 
-      console.log('SCANNED!');
-
       if (props.onScan) {
-        console.log('herrooooo');
-        props.onScan(id, newSensorName);
+        await props.onScan(id, newSensorName);
       }
-    } catch (e) {
-      console.log('IS NOT CONNECTED');
-    }
+    } catch (e) {}
     setLoading(false);
   };
 

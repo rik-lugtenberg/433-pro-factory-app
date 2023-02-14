@@ -16,9 +16,13 @@ const BleConstants = {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
     characteristicUUID: 'a2101007-7d7d-11eb-9439-0242ac130002',
   },
+  sensorControlCmd: {
+    serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
+    characteristicUUID: 'a2101006-7d7d-11eb-9439-0242ac130002',
+  },
   debug: {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
-    characteristicUUID: 'a2101008-7d7d-11eb-9439-0242ac130002',
+    characteristicUUID: 'a2101005-7d7d-11eb-9439-0242ac130002',
   },
   rebootInfo: {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
@@ -84,8 +88,6 @@ const BleConstants = {
     characteristicUUID: 'a2103001-7d7d-11eb-9439-0242ac130002',
     maxByteSize: 1,
   },
-  totalSizeRAW: 12582912,
-  totalSizeMetric: 4194304,
   playerHeight: {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
     characteristicUUID: 'a2102100-7d7d-11eb-9439-0242ac130002',
@@ -99,50 +101,6 @@ const BleConstants = {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
     characteristicUUID: 'a2102101-7d7d-11eb-9439-0242ac130002',
     maxByteSize: 2,
-  },
-
-  KPI: 'https://dev.api.433pro.by433.com/api/v1/app/players-sensors-sessions/create',
-  S3_API: 'https://dev.api.jogo.ai/jogo/api/upload-csv',
-  activities: [
-    '517 - Dribble 10m + pass + run 10m in straight line',
-    '518 - Dribble across penalty area + turn 180 + dribble and shoot the ball',
-    '519 - Run without ball + change direction(s) + receive the ball + shot',
-    '520 - Rondo 4 vs 1 in 5x5 meter square',
-    '106 - Shots from goal area line',
-  ],
-  rawData: {
-    modeName: 'RAW',
-    start: {
-      serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
-      characteristicUUID: 'a2101004-7d7d-11eb-9439-0242ac130002',
-      notificationUUID: 'a2101002-7d7d-11eb-9439-0242ac130002',
-      maxByteSize: 1,
-      data: 0x01,
-    },
-    stop: {
-      serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
-      characteristicUUID: 'a2101004-7d7d-11eb-9439-0242ac130002',
-      notificationUUID: 'a2101002-7d7d-11eb-9439-0242ac130002',
-      maxByteSize: 1,
-      data: 0x00,
-    },
-  },
-  metricData: {
-    modeName: 'Metric',
-    start: {
-      serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
-      characteristicUUID: 'a2101004-7d7d-11eb-9439-0242ac130002',
-      notificationUUID: 'a2101002-7d7d-11eb-9439-0242ac130002',
-      maxByteSize: 1,
-      data: 0x02,
-    },
-    stop: {
-      serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
-      characteristicUUID: 'a2101004-7d7d-11eb-9439-0242ac130002',
-      notificationUUID: 'a2101002-7d7d-11eb-9439-0242ac130002',
-      maxByteSize: 1,
-      data: 0x00,
-    },
   },
 };
 
