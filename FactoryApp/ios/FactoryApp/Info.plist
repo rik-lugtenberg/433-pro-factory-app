@@ -16,6 +16,8 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Bluetooth is used to communicate with BLE devices.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
@@ -35,6 +37,12 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>To connect to 433 Pro sensors</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To scan sensor QR code</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>FontAwesome.ttf</string>
@@ -42,16 +50,8 @@
 		<string>FontAwesome5_Regular.ttf</string>
 		<string>FontAwesome5_Solid.ttf</string>
 	</array>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>To connect to 433 Pro sensors</string>
-	<key>NSCameraUsageDescription</key>
-	<string>To scan sensor QR code</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string></string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
