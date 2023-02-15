@@ -33,6 +33,10 @@ function ScanScreen(props) {
       const newSensorName = getSensorName(data);
       const id = await bleService.pair(newSensorName);
 
+      // const removeDisconnect = bleService.onDisconnect(async id => {
+      //   console.log('is going to disconnect!!!!', id);
+      // });
+
       if (props.onScan) {
         await props.onScan(id, newSensorName);
       }

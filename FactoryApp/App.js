@@ -23,6 +23,7 @@ export default function App() {
 
   useEffect(() => {
     AppState.addEventListener('change', handleAppStateChange);
+
     (async () => {
       await checkPermissions();
     })();
@@ -41,8 +42,6 @@ export default function App() {
   };
 
   const resetSensor = async () => {
-    await bleService.disconnect(sensor.id);
-
     setScannedId(null);
     setSensor(defaultSensorValues);
   };

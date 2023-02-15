@@ -296,12 +296,14 @@ class BleService {
   async setToTransportMode(id) {
     const {serviceUUID, characteristicUUID} = BleConstants.sensorControlCmd;
 
-    const byteArray = [0xde, 0xad];
+    const byteArray = [0xad, 0xde];
     await this.write(id, serviceUUID, characteristicUUID, byteArray);
   }
 
   async getRSSI(id) {
     const rssi = await BleManager.readRSSI(id);
+
+    this.log(id, `RSSI | Reading data: ${rssi}`);
     return rssi;
   }
 
