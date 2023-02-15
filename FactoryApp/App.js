@@ -23,6 +23,7 @@ export default function App() {
 
   useEffect(() => {
     AppState.addEventListener('change', handleAppStateChange);
+    logService.log('test');
     (async () => {
       await checkPermissions();
     })();
@@ -47,14 +48,6 @@ export default function App() {
     setSensor(defaultSensorValues);
   };
 
-  const getDbmValues = dmbString => {
-    const splitArray = dmbString.split(',');
-    if (splitArray.length < 3) {
-      console.warn('INVALID DMB VALUES');
-    }
-    return Number.parseInt(splitArray[1].split(':').pop());
-  };
-
   const onScan = async (id, sensorName) => {
     setScannedId(id);
 
@@ -64,8 +57,6 @@ export default function App() {
     newSensor.firmware = await bleService.getFirmwareRevision(id);
     newSensor.battery = await bleService.getBatteryLevel(id);
     newSensor.dbmValue = await bleService.getRSSI(id);
-    console.log('new sensor dbm value : ', newSensor.dbmValue);
-    // newSensor.dbmValue = getDbmValues(await bleService.getDebugValue(id));
     newSensor.modelName = await bleService.getModelName(id);
     setSensor(newSensor);
   };

@@ -3,7 +3,7 @@ import {Text, View, TouchableOpacity} from 'react-native';
 import styles from './styles';
 import {checkPermissionForCamera} from '../../helpers/permissionHelper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import RNFetchBlob from 'rn-fetch-blob';
+// import RNFetchBlob from 'rn-fetch-blob';
 import bleService from '../../services/BleService';
 
 function DetailsScreen(props) {

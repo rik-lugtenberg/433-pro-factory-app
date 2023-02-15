@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 25,
     color: 'white',
-    fontWeight: 800
+    fontWeight: '800'
   },
   headerButtons: {
     width: 40,
