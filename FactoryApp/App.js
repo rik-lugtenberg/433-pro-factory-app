@@ -23,7 +23,6 @@ export default function App() {
 
   useEffect(() => {
     AppState.addEventListener('change', handleAppStateChange);
-    logService.log('test');
     (async () => {
       await checkPermissions();
     })();

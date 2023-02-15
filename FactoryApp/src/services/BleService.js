@@ -68,9 +68,8 @@ class BleService {
         e.serviceUUID === serviceUUID &&
         e.characteristicUUID === characteristicUUID,
     )?.name;
-    // const sensor = this.logSensors.find((e) => e.id === id);
 
-    logService.log(`${bleKeyName ? `${bleKeyName}` : ''} | ${message} `);
+    logService.log(`${bleKeyName ? `${bleKeyName} | ` : ''}  ${message} `);
   }
 
   async initialize() {
@@ -177,13 +176,11 @@ class BleService {
         characteristicUUID,
       );
 
-      console.log('komt hij hier nog?', parsedData);
-
       await BleManager.write(
         id,
         serviceUUID,
         characteristicUUID,
-        data,
+        parsedData,
         data.length,
       );
     } catch (e) {
@@ -299,16 +296,8 @@ class BleService {
   async setToTransportMode(id) {
     const {serviceUUID, characteristicUUID} = BleConstants.sensorControlCmd;
 
-    // const byteArray = [0xad, 0xde];
     const byteArray = [0xde, 0xad];
-
-    try {
-      console.log('before writing', id);
-      await this.write(id, serviceUUID, characteristicUUID, byteArray);
-      console.log('after writing');
-    } catch (e) {
-      console.log('the exception : ', e);
-    }
+    await this.write(id, serviceUUID, characteristicUUID, byteArray);
   }
 
   async getRSSI(id) {

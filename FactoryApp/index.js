@@ -8,8 +8,5 @@ import shipbook from '@shipbook/react-native';
 
 (async () => {
   AppRegistry.registerComponent(appName, () => App);
-  shipbook.start(
-    '63eb4c902a16313c55013e96',
-    'e242eaea90b0b1da0a2260e06b8a330e',
-  );
+  logService.initilize()
 })();

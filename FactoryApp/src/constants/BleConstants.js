@@ -18,7 +18,7 @@ const BleConstants = {
   },
   sensorControlCmd: {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
-    characteristicUUID: 'a2101006-7d7d-11eb-9439-0242ac130002',
+    characteristicUUID: 'a2101005-7d7d-11eb-9439-0242ac130002',
   },
   debug: {
     serviceUUID: 'a2101000-7d7d-11eb-9439-0242ac130002',
